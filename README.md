@@ -43,6 +43,8 @@ uvicorn app.main:app --reload
 
 ### Railway Deployment
 
+Live app: https://web-production-aa93.up.railway.app/
+
 1. Install Railway CLI:
 ```bash
 # On Windows
