@@ -17,12 +17,6 @@ class ChatApp {
         this.roomNameInput = document.getElementById('room-name');
         this.usernameInput = document.getElementById('username');
         this.joinBtn = document.getElementById('join-btn');
-        // Login elements
-        this.loginPanel = document.getElementById('login-panel');
-        this.loginForm = document.getElementById('login-form');
-        this.loginUsername = document.getElementById('login-username');
-        this.loginPassword = document.getElementById('login-password');
-        this.loginBtn = document.getElementById('login-btn');
         
         // Chat container elements
         this.chatContainer = document.getElementById('chat-container');
@@ -44,33 +38,7 @@ class ChatApp {
             this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
         }
 
-        // Pre-fill username from client-side login if available
-        const storedUser = localStorage.getItem('chatUser');
-        if (storedUser) {
-            try {
-                const parsed = JSON.parse(storedUser);
-                if (parsed && parsed.username) {
-                    this.usernameInput.value = parsed.username;
-                    // Hide login panel if exists
-                    if (this.loginPanel) this.loginPanel.style.display = 'none';
-                }
-            } catch (e) {}
-        }
-    }
-
-    handleLoginSubmit(e) {
-        e.preventDefault();
-        const username = this.loginUsername.value.trim();
-        if (!username) return alert('Please enter a username');
-        // Save locally (this is a demo; no server-side auth)
-        const payload = { username };
-        localStorage.setItem('chatUser', JSON.stringify(payload));
-        // Hide login and prefill join username
-        if (this.loginPanel) this.loginPanel.style.display = 'none';
-        this.usernameInput.value = username;
-        this.currentUsername = username;
-        // focus on room input
-        this.roomNameInput.focus();
+        // no client-side login; keep join form as the entry point
     }
         async handleFileUpload(e) {
             const file = e.target.files[0];
@@ -113,10 +81,7 @@ class ChatApp {
             this.joinRoom();
         });
 
-        // Login form submission (if present)
-        if (this.loginForm) {
-            this.loginForm.addEventListener('submit', (e) => this.handleLoginSubmit(e));
-        }
+        // no login form events (login removed)
         
         // Message form submission
         this.messageForm.addEventListener('submit', (e) => {
