@@ -14,6 +14,10 @@ A real-time chat application with reaction support built using FastAPI and WebSo
  - Private chat rooms
  - Share images and videos
  - Copyright © 2025 ManjusPrasad. All rights reserved.
+ - No chat history is stored (ephemeral messaging)
+ - Private chat rooms
+ - Share images and videos (uploads are stored in the `uploads/` folder; storage is ephemeral on many hosts)
+ - Copyright © 2025 ManjusPrasad. All rights reserved.
 
 ## Tech Stack
 
@@ -110,7 +114,6 @@ Architecture & components:
 
 Privacy & Security (valid points):
 - Ephemeral messaging by default — messages are intended to be transient; server-side storage is minimal and used for reaction updates and short-term functionality.
-- The app does not capture or store screenshots; however, it cannot technically prevent users from taking screenshots with their device/OS.
 - Media uploads are served from the `uploads/` directory; this storage is ephemeral on Railway. For production use, migrate media to a persistent store (S3) and use signed URLs.
 - No authentication is present; consider adding user authentication (OAuth/JWT) and access control for private rooms.
 
