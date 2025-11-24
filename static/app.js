@@ -7,6 +7,9 @@ class ChatApp {
         
         this.initializeElements();
         this.bindEvents();
+        // File/image/video upload
+        this.fileInput = document.getElementById('file-input');
+        this.uploadBtn = document.getElementById('upload-btn');
     }
     
     initializeElements() {
@@ -28,7 +31,41 @@ class ChatApp {
         this.messageForm = document.getElementById('message-form');
         this.messageInput = document.getElementById('message-input');
         this.sendBtn = document.getElementById('send-btn');
+        // File upload button
+        if (this.uploadBtn && this.fileInput) {
+            this.uploadBtn.addEventListener('click', () => this.fileInput.click());
+            this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        }
     }
+        async handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.url) {
+                    // Send a message with the file URL
+                    let content = '';
+                    if (file.type.startsWith('image/')) {
+                        content = `<img src='${data.url}' alt='image' style='max-width:220px;max-height:160px;border-radius:8px;' />`;
+                    } else if (file.type.startsWith('video/')) {
+                        content = `<video src='${data.url}' controls style='max-width:220px;max-height:160px;border-radius:8px;'></video>`;
+                    } else {
+                        content = `<a href='${data.url}' target='_blank'>${file.name}</a>`;
+                    }
+                    if (this.isConnected) {
+                        const message = { type: 'message', content };
+                        this.ws.send(JSON.stringify(message));
+                    }
+                }
+            } catch (err) {
+                alert('Upload failed.');
+            } finally {
+                this.fileInput.value = '';
+            }
+        }
     
     bindEvents() {
         // Join form submission
@@ -161,34 +198,27 @@ class ChatApp {
     addChatMessage(username, content) {
         const messageContainer = document.createElement('div');
         messageContainer.className = 'message-container';
-        
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${username === this.currentUsername ? 'own' : 'other'}`;
-        
         const now = new Date();
         const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
+        // If content contains <img> or <video>, render as HTML, else escape
+        let isMedia = /<(img|video)[^>]*>/.test(content);
         messageDiv.innerHTML = `
             <div class="message-header">${username} • ${timeString}</div>
-            <div class="message-content">${this.escapeHtml(content)}</div>
+            <div class="message-content">${isMedia ? content : this.escapeHtml(content)}</div>
         `;
-        
         const reactionsSpan = document.createElement('span');
         reactionsSpan.className = 'reactions';
-        
         // Add emoji picker button
         const emojiPickerBtn = document.createElement('button');
         emojiPickerBtn.className = 'emoji-picker-btn';
         emojiPickerBtn.innerHTML = '+';
         emojiPickerBtn.title = 'Add reaction';
-        
         messageContainer.appendChild(messageDiv);
         messageContainer.appendChild(reactionsSpan);
         messageContainer.appendChild(emojiPickerBtn);
-        
-        // Add hover events for emoji picker
         this.setupEmojiPicker(messageContainer, emojiPickerBtn);
-        
         this.messagesPane.appendChild(messageContainer);
         this.scrollToBottom();
     }

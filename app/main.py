@@ -9,9 +9,25 @@ import uvicorn, json, uuid
 from pydantic import ValidationError
 from .schemas import Message, MessageBroadcast, ReactionRequest, MessageRequest, ReactionData, AddReactionRequest, RemoveReactionRequest
 
+
+from fastapi import UploadFile, File, Form
+import os, shutil
+
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    # Save uploaded file to uploads dir
+    upload_dir = os.path.join(os.path.dirname(__file__), '..', 'uploads')
+    os.makedirs(upload_dir, exist_ok=True)
+    file_path = os.path.join(upload_dir, file.filename)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    # Return the URL to access the file
+    url = f"/uploads/{file.filename}"
+    return {"url": url}
 templates = Jinja2Templates(directory="templates")
 
 class ConnectionManager:
