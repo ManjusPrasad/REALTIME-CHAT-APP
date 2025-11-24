@@ -7,9 +7,7 @@ class ChatApp {
         
         this.initializeElements();
         this.bindEvents();
-        // File/image/video upload
-        this.fileInput = document.getElementById('file-input');
-        this.uploadBtn = document.getElementById('upload-btn');
+        this.headerPrivacy = document.getElementById('header-privacy');
     }
     
     initializeElements() {
@@ -31,7 +29,9 @@ class ChatApp {
         this.messageForm = document.getElementById('message-form');
         this.messageInput = document.getElementById('message-input');
         this.sendBtn = document.getElementById('send-btn');
-        // File upload button
+        // File upload elements (ensure we grab them now so listeners attach correctly)
+        this.fileInput = document.getElementById('file-input');
+        this.uploadBtn = document.getElementById('upload-btn');
         if (this.uploadBtn && this.fileInput) {
             this.uploadBtn.addEventListener('click', () => this.fileInput.click());
             this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
@@ -163,6 +163,12 @@ class ChatApp {
         this.chatContainer.style.display = 'flex';
         this.currentRoomDisplay.textContent = `Room: ${this.currentRoom}`;
         this.messageInput.focus();
+        // Hide privacy UI after login
+        const bottomBar = document.getElementById('bottom-bar');
+        const privacyBanner = document.getElementById('privacy-banner');
+        if (bottomBar) bottomBar.style.display = 'none';
+        if (this.headerPrivacy) this.headerPrivacy.style.display = 'none';
+        if (privacyBanner) privacyBanner.style.display = 'none';
         
         // Reset body styles for chat view
         document.body.style.alignItems = 'stretch';
@@ -400,6 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const privacyModal = document.getElementById('privacy-modal');
         const closePrivacy = document.getElementById('close-privacy');
         const privacyBtn = document.getElementById('privacy-btn');
+        const privacyBtnHeader = document.getElementById('privacy-btn-header');
         const privacyLink = document.getElementById('privacy-link');
 
         const accepted = localStorage.getItem('privacyAccepted') === 'true';
@@ -418,6 +425,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (privacyModal) privacyModal.style.display = 'flex';
         });
         if (privacyBtn) privacyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (privacyModal) privacyModal.style.display = 'flex';
+        });
+        if (privacyBtnHeader) privacyBtnHeader.addEventListener('click', (e) => {
             e.preventDefault();
             if (privacyModal) privacyModal.style.display = 'flex';
         });
