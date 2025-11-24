@@ -14,6 +14,7 @@ class Message(BaseModel):
     type: Literal["message", "join", "leave", "reaction", "add_reaction", "remove_reaction"]
     user: str
     content: Optional[str] = None
+    view_once: bool = False
     timestamp: datetime
     reactions: ReactionData = ReactionData()
     online: Optional[List[str]] = None  # For join/leave messages
@@ -24,6 +25,7 @@ class MessageBroadcast(BaseModel):
     type: Literal["message", "join", "leave", "reaction", "reaction_update", "add_reaction", "remove_reaction"]
     user: str
     content: Optional[str] = None
+    view_once: Optional[bool] = None
     message_id: Optional[str] = None  # For reaction updates
     reactions: Optional[ReactionData] = None
     emoji: Optional[str] = None  # For reaction updates
@@ -58,3 +60,4 @@ class MessageRequest(BaseModel):
     """Model for incoming message requests"""
     type: Literal["message"]
     content: str
+    view_once: Optional[bool] = False

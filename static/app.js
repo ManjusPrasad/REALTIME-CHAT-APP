@@ -32,6 +32,7 @@ class ChatApp {
         // File upload elements (ensure we grab them now so listeners attach correctly)
         this.fileInput = document.getElementById('file-input');
         this.uploadBtn = document.getElementById('upload-btn');
+        this.viewOnceCheckbox = document.getElementById('view-once-checkbox');
         if (this.uploadBtn && this.fileInput) {
             this.uploadBtn.addEventListener('click', () => this.fileInput.click());
             this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
@@ -42,6 +43,9 @@ class ChatApp {
             if (!file) return;
             const formData = new FormData();
             formData.append('file', file);
+            // include view-once flag if checkbox present
+            const viewOnce = this.viewOnceCheckbox && this.viewOnceCheckbox.checked;
+            if (viewOnce) formData.append('view_once', 'true');
             try {
                 const res = await fetch('/upload', { method: 'POST', body: formData });
                 const data = await res.json();
@@ -56,7 +60,7 @@ class ChatApp {
                         content = `<a href='${data.url}' target='_blank'>${file.name}</a>`;
                     }
                     if (this.isConnected) {
-                        const message = { type: 'message', content };
+                        const message = { type: 'message', content, view_once: !!data.token };
                         this.ws.send(JSON.stringify(message));
                     }
                 }
@@ -64,6 +68,7 @@ class ChatApp {
                 alert('Upload failed.');
             } finally {
                 this.fileInput.value = '';
+                if (this.viewOnceCheckbox) this.viewOnceCheckbox.checked = false;
             }
         }
     
@@ -188,7 +193,7 @@ class ChatApp {
     handleMessage(data) {
         switch (data.type) {
             case 'message':
-                this.addChatMessage(data.user, data.content);
+                this.addChatMessage(data.user, data.content, data.view_once, data.message_id);
                 break;
             case 'join':
                 this.updateUsersList(data.online);
@@ -201,19 +206,37 @@ class ChatApp {
         }
     }
     
-    addChatMessage(username, content) {
+    addChatMessage(username, content, viewOnce = false, messageId = null) {
         const messageContainer = document.createElement('div');
         messageContainer.className = 'message-container';
+        if (messageId) messageContainer.dataset.messageId = messageId;
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${username === this.currentUsername ? 'own' : 'other'}`;
         const now = new Date();
         const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        // If content contains <img> or <video>, render as HTML, else escape
-        let isMedia = /<(img|video)[^>]*>/.test(content);
-        messageDiv.innerHTML = `
-            <div class="message-header">${username} • ${timeString}</div>
-            <div class="message-content">${isMedia ? content : this.escapeHtml(content)}</div>
-        `;
+        // Render view-once placeholders specially so media is fetched only when the user chooses to view it
+        if (viewOnce) {
+            // try to extract token from content (expecting /view/{token})
+            const tokenMatch = content.match(/\/view\/([a-f0-9]+)/i);
+            const token = tokenMatch ? tokenMatch[1] : null;
+            const placeholderHtml = token ?
+                `<div class="view-once-placeholder" data-token="${token}">` +
+                    `<div class="view-once-label">View Once</div>` +
+                    `<button class="view-once-btn">Open</button>` +
+                `</div>` : this.escapeHtml('[View-once media]');
+
+            messageDiv.innerHTML = `
+                <div class="message-header">${username} • ${timeString}</div>
+                <div class="message-content">${placeholderHtml}</div>
+            `;
+        } else {
+            // If content contains <img> or <video>, render as HTML, else escape
+            let isMedia = /<(img|video)[^>]*>/.test(content);
+            messageDiv.innerHTML = `
+                <div class="message-header">${username} • ${timeString}</div>
+                <div class="message-content">${isMedia ? content : this.escapeHtml(content)}</div>
+            `;
+        }
         const reactionsSpan = document.createElement('span');
         reactionsSpan.className = 'reactions';
         // Add emoji picker button
@@ -226,6 +249,43 @@ class ChatApp {
         messageContainer.appendChild(emojiPickerBtn);
         this.setupEmojiPicker(messageContainer, emojiPickerBtn);
         this.messagesPane.appendChild(messageContainer);
+        // Attach handler for view-once open buttons
+        if (viewOnce) {
+            const placeholder = messageContainer.querySelector('.view-once-placeholder');
+            if (placeholder) {
+                const btn = placeholder.querySelector('.view-once-btn');
+                btn.addEventListener('click', async () => {
+                    const token = placeholder.dataset.token;
+                    if (!token) return;
+                    try {
+                        const res = await fetch(`/view/${token}`);
+                        if (!res.ok) {
+                            placeholder.innerHTML = '<div class="viewed-label">(Content not available)</div>';
+                            return;
+                        }
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        // Create modal-like viewer
+                        const viewer = document.createElement('div');
+                        viewer.className = 'view-once-viewer';
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.style.maxWidth = '90%';
+                        img.style.maxHeight = '90%';
+                        viewer.appendChild(img);
+                        viewer.addEventListener('click', () => {
+                            document.body.removeChild(viewer);
+                            URL.revokeObjectURL(url);
+                            // mark as viewed
+                            placeholder.innerHTML = '<div class="viewed-label">Viewed</div>';
+                        });
+                        document.body.appendChild(viewer);
+                    } catch (err) {
+                        placeholder.innerHTML = '<div class="viewed-label">(Error showing content)</div>';
+                    }
+                });
+            }
+        }
         this.scrollToBottom();
     }
     

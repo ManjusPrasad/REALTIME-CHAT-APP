@@ -479,3 +479,34 @@ body {
     .bottom-bar { right: 8px; bottom: 8px; }
     .privacy-banner { left:8px; right:8px; bottom:70px; }
 }
+
+/* View-once styles */
+.view-once-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fff6f0;
+    border: 1px dashed #ffb88c;
+    border-radius: 8px;
+    color: #a64b00;
+}
+.view-once-placeholder .view-once-label { font-weight:700; }
+.view-once-btn {
+    padding: 6px 10px;
+    background: #ff7a45;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.viewed-label { color:#888; font-style:italic; }
+.view-once-viewer {
+    position: fixed;
+    inset: 0;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
+}

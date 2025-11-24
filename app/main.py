@@ -1,5 +1,5 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import Dict, List, Union, Optional
@@ -22,17 +22,60 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...), view_once: bool = Form(False)):
+    """Save uploaded file and optionally create a view-once token.
+    If `view_once` is True a token URL `/view/{token}` is returned; otherwise a static `/uploads/{filename}` URL is returned.
+    """
     # Save uploaded file to uploads dir
     upload_dir = os.path.join(os.path.dirname(__file__), '..', 'uploads')
     os.makedirs(upload_dir, exist_ok=True)
-    file_path = os.path.join(upload_dir, file.filename)
+    # make filename unique to avoid collisions
+    unique_name = f"{uuid.uuid4().hex}_{file.filename}"
+    file_path = os.path.join(upload_dir, unique_name)
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    # Return the URL to access the file
-    url = f"/uploads/{file.filename}"
-    return {"url": url}
+
+    if view_once:
+        token = uuid.uuid4().hex
+        manager.view_tokens[token] = file_path
+        url = f"/view/{token}"
+        return {"url": url, "token": token}
+    else:
+        # Return the URL to access the file
+        url = f"/uploads/{unique_name}"
+        return {"url": url}
+
+
+@app.get("/view/{token}")
+async def view_once(token: str):
+    """Serve a view-once file for the given token and delete it after first successful fetch.
+    Returns 404 if token not found or already consumed.
+    """
+    token_map = manager.view_tokens
+    if token not in token_map:
+        return HTMLResponse(status_code=404, content="Not found")
+
+    file_path = token_map[token]
+    if not os.path.exists(file_path):
+        # cleanup and 404
+        token_map.pop(token, None)
+        return HTMLResponse(status_code=404, content="Not found")
+
+    # Serve the file as FileResponse then delete it and remove the token
+    try:
+        response = FileResponse(path=file_path)
+        # remove token and file after serving
+        try:
+            os.remove(file_path)
+        except Exception:
+            pass
+        token_map.pop(token, None)
+        return response
+    except Exception:
+        return HTMLResponse(status_code=500, content="Error serving file")
 templates = Jinja2Templates(directory="templates")
 
 class ConnectionManager:
@@ -40,6 +83,8 @@ class ConnectionManager:
         self.rooms: Dict[str, List[WebSocket]] = {}
         self.users: Dict[str, Dict[str, str]] = {}   # room  {ws_id: username}
         self.messages: Dict[str, Dict[str, Message]] = {}  # room  {message_id: Message}
+        # map view tokens to file paths for view-once media
+        self.view_tokens: Dict[str, str] = {}
 
     async def connect(self, room: str, username: str, websocket: WebSocket):
         await websocket.accept()
@@ -148,6 +193,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str, username: str):
                         type="message",
                         user=username,
                         content=message_request.content,
+                        view_once=getattr(message_request, "view_once", False),
                         timestamp=datetime.now(),
                     )
                     manager.store_message(room, message)
@@ -155,6 +201,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str, username: str):
                         type="message",
                         user=username,
                         content=message_request.content,
+                        view_once=getattr(message_request, "view_once", False),
                         message_id=message.id,
                         timestamp=message.timestamp
                     ))
