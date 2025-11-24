@@ -410,3 +410,60 @@ body {
         text-align: center;
     }
 }
+
+/* Bottom bar for Play Store link and Privacy button */
+.bottom-bar {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    gap: 8px;
+    z-index: 1200;
+}
+
+.bottom-button {
+    padding: 10px 14px;
+    background: white;
+    color: #333;
+    border-radius: 999px;
+    border: 1px solid #e1e5e9;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    cursor: pointer;
+}
+
+.bottom-button:hover {
+    transform: translateY(-3px);
+}
+
+/* Privacy banner */
+.privacy-banner {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 80px;
+    background: rgba(255,255,255,0.98);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    z-index: 1300;
+}
+
+.privacy-content p {
+    color: #333;
+    font-size: 14px;
+}
+
+.privacy-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+.accept-btn { background: #667eea; color: white; border: none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+.learn-more-btn { background: transparent; border:1px solid #e1e5e9; padding:8px 12px; border-radius:8px; cursor:pointer; }
+
+/* Privacy modal */
+.privacy-modal { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; z-index:1400; background: rgba(0,0,0,0.4); }
+.privacy-modal-content { background:white; padding:20px; border-radius:10px; max-width:600px; width:90%; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+
+@media (max-width: 600px) {
+    .bottom-bar { right: 8px; bottom: 8px; }
+    .privacy-banner { left:8px; right:8px; bottom:70px; }
+}

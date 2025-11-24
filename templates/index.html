@@ -75,5 +75,30 @@
 
     <!-- JavaScript -->
     <script src="/static/app.js"></script>
+    <!-- Bottom bar: Play Store + Privacy -->
+    <div id="bottom-bar" class="bottom-bar">
+        <a id="play-store-btn" class="bottom-button" href="https://play.google.com/store/apps/details?id=com.example.app" target="_blank" rel="noopener">Get on Google Play</a>
+        <button id="privacy-btn" class="bottom-button">Privacy Policy</button>
+    </div>
+
+    <!-- Privacy Banner / Modal -->
+    <div id="privacy-banner" class="privacy-banner" style="display: none;">
+        <div class="privacy-content">
+            <p>This project does not capture screenshots or personal data by default. By using this application you agree to the <a href="#" id="privacy-link">privacy policy</a>.</p>
+            <div class="privacy-actions">
+                <button id="accept-privacy" class="accept-btn">Accept</button>
+                <button id="learn-more" class="learn-more-btn">Learn more</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="privacy-modal" class="privacy-modal" style="display:none;">
+        <div class="privacy-modal-content">
+            <h3>Privacy Policy</h3>
+            <p>This application is a demo chat service. It does not capture screenshots, record audio, or access your files. The server stores message text and lightweight metadata (username, timestamp) required for chat functionality. If you integrate third-party services that collect additional data, make sure to disclose them here.</p>
+            <p>For questions, contact the project owner.</p>
+            <div style="text-align:right; margin-top:12px;"><button id="close-privacy" class="accept-btn">Close</button></div>
+        </div>
+    </div>
 </body>
 </html>

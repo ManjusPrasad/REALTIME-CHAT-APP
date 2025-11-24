@@ -361,5 +361,44 @@ class ChatApp {
 
 // Initialize the chat app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new ChatApp();
+    const app = new ChatApp();
+    // Privacy controls: banner/modal and accept handling
+    function setupPrivacyControls() {
+        const privacyBanner = document.getElementById('privacy-banner');
+        const acceptBtn = document.getElementById('accept-privacy');
+        const learnMore = document.getElementById('learn-more');
+        const privacyModal = document.getElementById('privacy-modal');
+        const closePrivacy = document.getElementById('close-privacy');
+        const privacyBtn = document.getElementById('privacy-btn');
+        const privacyLink = document.getElementById('privacy-link');
+
+        const accepted = localStorage.getItem('privacyAccepted') === 'true';
+        if (!accepted) {
+            if (privacyBanner) privacyBanner.style.display = 'block';
+        }
+
+        const accept = () => {
+            localStorage.setItem('privacyAccepted', 'true');
+            if (privacyBanner) privacyBanner.style.display = 'none';
+        };
+
+        if (acceptBtn) acceptBtn.addEventListener('click', accept);
+        if (learnMore) learnMore.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (privacyModal) privacyModal.style.display = 'flex';
+        });
+        if (privacyBtn) privacyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (privacyModal) privacyModal.style.display = 'flex';
+        });
+        if (closePrivacy) closePrivacy.addEventListener('click', () => {
+            if (privacyModal) privacyModal.style.display = 'none';
+        });
+        if (privacyLink) privacyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (privacyModal) privacyModal.style.display = 'flex';
+        });
+    }
+
+    setupPrivacyControls();
 });
