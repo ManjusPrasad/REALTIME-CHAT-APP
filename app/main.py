@@ -29,8 +29,8 @@ async def upload_file(file: UploadFile = File(...), view_once: bool = Form(False
     """Save uploaded file and optionally create a view-once token.
     If `view_once` is True a token URL `/view/{token}` is returned; otherwise a static `/uploads/{filename}` URL is returned.
     """
-    # Save uploaded file to uploads dir
-    upload_dir = os.path.join(os.path.dirname(__file__), '..', 'uploads')
+    # Save uploaded file to uploads dir (use absolute path to avoid relative-path issues)
+    upload_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'uploads'))
     os.makedirs(upload_dir, exist_ok=True)
     # make filename unique to avoid collisions
     unique_name = f"{uuid.uuid4().hex}_{file.filename}"
@@ -40,7 +40,8 @@ async def upload_file(file: UploadFile = File(...), view_once: bool = Form(False
 
     if view_once:
         token = uuid.uuid4().hex
-        manager.view_tokens[token] = file_path
+        # store absolute normalized path
+        manager.view_tokens[token] = os.path.abspath(file_path)
         url = f"/view/{token}"
         return {"url": url, "token": token}
     else:
@@ -59,6 +60,7 @@ async def view_once(token: str):
         return HTMLResponse(status_code=404, content="Not found")
 
     file_path = token_map[token]
+    file_path = os.path.abspath(file_path)
     if not os.path.exists(file_path):
         # cleanup and 404
         token_map.pop(token, None)
