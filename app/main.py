@@ -13,7 +13,11 @@ from .schemas import Message, MessageBroadcast, ReactionRequest, MessageRequest,
 from fastapi import UploadFile, File, Form
 import os, shutil
 
+
+from .auth import router as auth_router, verify_token
+
 app = FastAPI()
+app.include_router(auth_router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
@@ -25,10 +29,20 @@ async def health():
 
 
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...), view_once: bool = Form(False)):
+async def upload_file(request: Request, file: UploadFile = File(...), view_once: bool = Form(False)):
     """Save uploaded file and optionally create a view-once token.
     If `view_once` is True a token URL `/view/{token}` is returned; otherwise a static `/uploads/{filename}` URL is returned.
     """
+    # Verify Authorization header (expect Bearer token)
+    auth = request.headers.get('authorization')
+    if not auth or not auth.lower().startswith('bearer '):
+        return HTMLResponse(status_code=401, content="Unauthorized")
+    token = auth.split(None, 1)[1]
+    try:
+        verify_token(token)
+    except Exception:
+        return HTMLResponse(status_code=401, content="Unauthorized")
+
     # Save uploaded file to uploads dir (use absolute path to avoid relative-path issues)
     upload_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'uploads'))
     os.makedirs(upload_dir, exist_ok=True)
@@ -211,6 +225,21 @@ async def get_index(request: Request):
 
 @app.websocket("/ws/{room}/{username}")
 async def websocket_endpoint(websocket: WebSocket, room: str, username: str):
+    # Extract token from query params and verify
+    token = websocket.query_params.get('token')
+    if not token:
+        await websocket.close(code=1008)
+        return
+    try:
+        token_user = verify_token(token)
+    except Exception:
+        await websocket.close(code=1008)
+        return
+    # Ensure the token user matches the username path
+    if token_user != username:
+        await websocket.close(code=1008)
+        return
+
     await manager.connect(room, username, websocket)
     try:
         while True:

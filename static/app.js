@@ -5,6 +5,13 @@ class ChatApp {
         this.currentUsername = null;
         this.isConnected = false;
         
+        // Require JWT login token to access the chat UI; redirect to login page if missing
+        const token = localStorage.getItem('chat_jwt');
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+
         this.initializeElements();
         this.bindEvents();
         this.headerPrivacy = document.getElementById('header-privacy');
@@ -49,7 +56,10 @@ class ChatApp {
             const viewOnce = this.viewOnceCheckbox && this.viewOnceCheckbox.checked;
             if (viewOnce) formData.append('view_once', 'true');
             try {
-                const res = await fetch('/upload', { method: 'POST', body: formData });
+                const token = localStorage.getItem('chat_jwt');
+                const headers = {};
+                if (token) headers['Authorization'] = 'Bearer ' + token;
+                const res = await fetch('/upload', { method: 'POST', body: formData, headers });
                 const data = await res.json();
                 if (data.url) {
                     // Send a message with the file URL
@@ -132,7 +142,8 @@ class ChatApp {
     connectWebSocket() {
         return new Promise((resolve, reject) => {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${protocol}//${window.location.host}/ws/${this.currentRoom}/${this.currentUsername}`;
+            const token = localStorage.getItem('chat_jwt');
+            const wsUrl = `${protocol}//${window.location.host}/ws/${this.currentRoom}/${this.currentUsername}?token=${encodeURIComponent(token)}`;
             
             this.ws = new WebSocket(wsUrl);
             
