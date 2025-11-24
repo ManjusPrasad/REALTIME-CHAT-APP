@@ -74,6 +74,14 @@ railway up
 
 - `PORT` - Port number (set automatically by Railway)
 
+## Download APK
+
+If you want to install the Android app directly, download the APK here:
+
+- Official APK: https://warehouse.appilix.com/uploads/app-apk-692332f389054-1763914483.apk
+
+Note: Only install APKs from trusted sources. Installing APKs from unknown sources may pose security risks.
+
 ## Testing
 
 Run the test suite:
