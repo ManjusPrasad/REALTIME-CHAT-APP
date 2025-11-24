@@ -223,6 +223,11 @@ manager = ConnectionManager()
 async def get_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+
+@app.get("/login")
+async def get_login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
 @app.websocket("/ws/{room}/{username}")
 async def websocket_endpoint(websocket: WebSocket, room: str, username: str):
     # Extract token from query params and verify

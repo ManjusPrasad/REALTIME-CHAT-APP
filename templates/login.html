@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Sign Up - Chat App</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+        .auth-container { background: #fff; border-radius: 18px; box-shadow: 0 10px 40px rgba(102,126,234,0.18); padding: 36px 32px; max-width: 370px; width: 100%; }
+        .auth-title { font-size: 2rem; font-weight: 700; color: #667eea; text-align:center; margin-bottom: 18px; }
+        .auth-toggle { text-align:center; margin-bottom:18px; }
+        .auth-toggle button { background:none; border:none; color:#764ba2; font-weight:600; cursor:pointer; font-size:1em; }
+        .auth-form { display:flex; flex-direction:column; gap:16px; }
+        .auth-form input { padding:12px; border-radius:8px; border:1.5px solid #e1e5e9; font-size:1em; }
+        .auth-form input:focus { border-color:#667eea; outline:none; }
+        .auth-form button { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border:none; border-radius:8px; padding:12px; font-size:1.1em; font-weight:700; cursor:pointer; transition:background 0.2s; }
+        .auth-form button:hover { background:linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .auth-error { color:#ff4444; text-align:center; margin-bottom:8px; font-size:0.98em; }
+        .auth-success { color:#44bb44; text-align:center; margin-bottom:8px; font-size:0.98em; }
+        .password-strength { font-size:0.92em; margin-top:-10px; margin-bottom:8px; color:#888; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-title">Welcome to Chat App</div>
+        <div class="auth-toggle">
+            <button id="show-login">Login</button> |
+            <button id="show-register">Sign Up</button>
+        </div>
+        <div id="auth-error" class="auth-error" style="display:none;"></div>
+        <div id="auth-success" class="auth-success" style="display:none;"></div>
+        <form id="login-form" class="auth-form" style="display:none;">
+            <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+            <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+            <button type="submit">Login</button>
+        </form>
+        <form id="register-form" class="auth-form" style="display:none;">
+            <input type="text" id="register-username" placeholder="Username" required autocomplete="username">
+            <input type="password" id="register-password" placeholder="Password (min 8 chars)" required autocomplete="new-password">
+            <div id="password-strength" class="password-strength"></div>
+            <button type="submit">Create Account</button>
+        </form>
+    </div>
+    <script>
+    // Modern login/signup UI logic
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const showLoginBtn = document.getElementById('show-login');
+    const showRegisterBtn = document.getElementById('show-register');
+    const authError = document.getElementById('auth-error');
+    const authSuccess = document.getElementById('auth-success');
+    const passwordStrength = document.getElementById('password-strength');
+
+    function showLogin() {
+        loginForm.style.display = '';
+        registerForm.style.display = 'none';
+        authError.style.display = 'none';
+        authSuccess.style.display = 'none';
+    }
+    function showRegister() {
+        loginForm.style.display = 'none';
+        registerForm.style.display = '';
+        authError.style.display = 'none';
+        authSuccess.style.display = 'none';
+    }
+    showLoginBtn.onclick = showLogin;
+    showRegisterBtn.onclick = showRegister;
+    showLogin();
+
+    // Password strength check
+    document.getElementById('register-password').addEventListener('input', function() {
+        const val = this.value;
+        let msg = '';
+        if (val.length < 8) msg = 'Too short';
+        else if (!/[A-Z]/.test(val)) msg = 'Add an uppercase letter';
+        else if (!/[0-9]/.test(val)) msg = 'Add a number';
+        else if (!/[^A-Za-z0-9]/.test(val)) msg = 'Add a special character';
+        else msg = 'Strong password!';
+        passwordStrength.textContent = msg;
+        passwordStrength.style.color = msg === 'Strong password!' ? '#44bb44' : '#888';
+    });
+
+    // Register
+    registerForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('register-username').value.trim();
+        const password = document.getElementById('register-password').value;
+        authError.style.display = 'none';
+        authSuccess.style.display = 'none';
+        try {
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Registration failed');
+            authSuccess.textContent = 'Account created! You can now log in.';
+            authSuccess.style.display = '';
+            showLogin();
+        } catch (err) {
+            authError.textContent = err.message;
+            authError.style.display = '';
+        }
+    };
+
+    // Login
+    loginForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value;
+        authError.style.display = 'none';
+        authSuccess.style.display = 'none';
+        try {
+            const form = new URLSearchParams();
+            form.append('username', username);
+            form.append('password', password);
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: form
+            });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Login failed');
+            const data = await res.json();
+            localStorage.setItem('chat_jwt', data.access_token);
+            window.location.href = '/';
+        } catch (err) {
+            authError.textContent = err.message;
+            authError.style.display = '';
+        }
+    };
+    </script>
+</body>
+</html>
