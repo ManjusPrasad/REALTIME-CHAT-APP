@@ -35,6 +35,10 @@
                     <span class="status-indicator offline"></span>
                     <span id="status-text">Disconnected</span>
                 </div>
+                <!-- Privacy button only shown on landing page, not after login -->
+                <div class="header-privacy" id="header-privacy" style="display:none;">
+                    <button id="privacy-btn-header" class="bottom-button" style="margin-left:12px; padding:8px 12px; font-size:0.9em;">Privacy</button>
+                </div>
             </div>
         </header>
 
@@ -85,7 +89,7 @@
     <!-- Privacy Banner / Modal -->
     <div id="privacy-banner" class="privacy-banner" style="display: none;">
         <div class="privacy-content">
-            <p><strong>Privacy Notice:</strong> This chat app does <u>not</u> store any chat history, cannot take screenshots, supports private chat rooms, and allows sharing images/videos. By using this app, you agree to the <a href="#" id="privacy-link">privacy policy</a>.</p>
+            <p><strong>Privacy Notice:</strong> This app does not store chat history, cannot take screenshots, supports private rooms, and allows sharing images/videos. By using this app, you agree to the <a href="#" id="privacy-link">privacy policy</a>.</p>
             <div class="privacy-actions">
                 <button id="accept-privacy" class="accept-btn">Accept</button>
                 <button id="learn-more" class="learn-more-btn">Learn more</button>
@@ -95,18 +99,27 @@
 
     <div id="privacy-modal" class="privacy-modal" style="display:none;">
         <div class="privacy-modal-content">
-            <h2 style="text-align:center; color:#667eea; margin-bottom:12px;">Privacy Policy</h2>
-            <ul style="font-size:1.1em; margin-bottom:18px;">
-                <li><b>No chat history is stored</b> — all messages are ephemeral and not saved on the server.</li>
-                <li><b>No screenshots</b> — the app cannot capture or store screenshots.</li>
-                <li><b>Private chat rooms</b> — create and join rooms for private conversations.</li>
-                <li><b>Share images & videos</b> — send media securely in your chat rooms.</li>
-                <li><b>No personal data collection</b> — we do not collect or sell your data.</li>
-            </ul>
-            <div style="background:#f8f9fa; border-radius:8px; padding:10px 16px; margin-bottom:12px; font-size:0.98em; color:#555;">
-                <b>Copyright &copy; 2025 ManjusPrasad.</b> All rights reserved. This app is for personal and educational use only. Unauthorized copying or distribution is prohibited.
+            <div class="privacy-modal-header">
+                <div class="privacy-icon">🔒</div>
+                <div class="privacy-title">Privacy & Security</div>
             </div>
-            <div style="text-align:right; margin-top:12px;"><button id="close-privacy" class="accept-btn">Close</button></div>
+            <div class="privacy-modal-body">
+                <p class="lead">We designed this app with privacy in mind. Key points:</p>
+                <ul class="privacy-list">
+                    <li><span class="badge">•</span><strong> Ephemeral messages:</strong> Messages are not persisted by default — chats are transient.</li>
+                    <li><span class="badge">•</span><strong> Screenshots:</strong> The app does not capture or store screenshots; it cannot prevent device screenshots taken by users.</li>
+                    <li><span class="badge">•</span><strong> Private rooms:</strong> Rooms are isolated — only connected users in a room receive messages.</li>
+                    <li><span class="badge">•</span><strong> Media sharing:</strong> Images and videos can be shared inline; uploads are stored in the `uploads/` folder (ephemeral on Railway).</li>
+                    <li><span class="badge">•</span><strong> Minimal data:</strong> We only store lightweight metadata needed for operation (username, timestamp) when required.</li>
+                </ul>
+                <div class="privacy-note">
+                    <strong>Important:</strong> For production, move media uploads to persistent storage (S3) and add authentication and E2E encryption if you require strict confidentiality.
+                </div>
+                <div class="privacy-footer">
+                    <div class="copyright">© 2025 ManjusPrasad. All rights reserved.</div>
+                    <button id="close-privacy" class="accept-btn">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>

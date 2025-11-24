@@ -461,7 +461,19 @@ body {
 
 /* Privacy modal */
 .privacy-modal { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; z-index:1400; background: rgba(0,0,0,0.4); }
-.privacy-modal-content { background:white; padding:32px 24px 24px 24px; border-radius:16px; max-width:480px; width:95%; box-shadow:0 10px 30px rgba(102,126,234,0.18); border:2px solid #667eea22; }
+.privacy-modal-content { background:white; padding:18px; border-radius:16px; max-width:520px; width:95%; box-shadow:0 10px 30px rgba(102,126,234,0.18); border:2px solid #667eea22; }
+
+.privacy-modal-header { display:flex; align-items:center; gap:12px; padding:12px 6px; background: linear-gradient(90deg, #667eea22, #764ba222); border-radius:12px; }
+.privacy-icon { font-size:28px; }
+.privacy-title { font-size:1.2rem; font-weight:800; color:#333; }
+.privacy-modal-body { padding:14px; }
+.privacy-modal-body .lead { font-weight:700; color:#333; margin-bottom:8px; }
+.privacy-list { list-style:none; padding-left:0; margin:0 0 10px 0; }
+.privacy-list li { margin-bottom:10px; font-size:0.98rem; color:#444; }
+.privacy-list .badge { color:#667eea; margin-right:8px; font-weight:700; }
+.privacy-note { background:#f3f6ff; padding:10px; border-radius:8px; color:#333; margin-bottom:12px; }
+.privacy-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.privacy-footer .copyright { color:#666; font-size:0.9rem; }
 
 @media (max-width: 600px) {
     .bottom-bar { right: 8px; bottom: 8px; }
