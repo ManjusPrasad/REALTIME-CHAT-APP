@@ -9,6 +9,7 @@ A real-time chat application with reaction support built using FastAPI and WebSo
 - User presence (join/leave notifications)
 - Message reactions with emojis
 - Modern, responsive UI
+ - Note: This application does not capture or take screenshots (no screen-capture functionality).
 
 ## Tech Stack
 
