@@ -79,14 +79,13 @@
     <script src="/static/app.js"></script>
     <!-- Bottom bar: Play Store + Privacy -->
     <div id="bottom-bar" class="bottom-bar">
-        <a id="play-store-btn" class="bottom-button" href="https://play.google.com/store/apps/details?id=com.example.app" target="_blank" rel="noopener">Get on Google Play</a>
-        <button id="privacy-btn" class="bottom-button">Privacy Policy</button>
+        <button id="privacy-btn" class="bottom-button">Privacy</button>
     </div>
 
     <!-- Privacy Banner / Modal -->
     <div id="privacy-banner" class="privacy-banner" style="display: none;">
         <div class="privacy-content">
-            <p>This project does not capture screenshots or personal data by default. By using this application you agree to the <a href="#" id="privacy-link">privacy policy</a>.</p>
+            <p><strong>Privacy Notice:</strong> This chat app does <u>not</u> store any chat history, cannot take screenshots, supports private chat rooms, and allows sharing images/videos. By using this app, you agree to the <a href="#" id="privacy-link">privacy policy</a>.</p>
             <div class="privacy-actions">
                 <button id="accept-privacy" class="accept-btn">Accept</button>
                 <button id="learn-more" class="learn-more-btn">Learn more</button>
@@ -96,9 +95,17 @@
 
     <div id="privacy-modal" class="privacy-modal" style="display:none;">
         <div class="privacy-modal-content">
-            <h3>Privacy Policy</h3>
-            <p>This application is a demo chat service. It does not capture screenshots, record audio, or access your files. The server stores message text and lightweight metadata (username, timestamp) required for chat functionality. If you integrate third-party services that collect additional data, make sure to disclose them here.</p>
-            <p>For questions, contact the project owner.</p>
+            <h2 style="text-align:center; color:#667eea; margin-bottom:12px;">Privacy Policy</h2>
+            <ul style="font-size:1.1em; margin-bottom:18px;">
+                <li><b>No chat history is stored</b> — all messages are ephemeral and not saved on the server.</li>
+                <li><b>No screenshots</b> — the app cannot capture or store screenshots.</li>
+                <li><b>Private chat rooms</b> — create and join rooms for private conversations.</li>
+                <li><b>Share images & videos</b> — send media securely in your chat rooms.</li>
+                <li><b>No personal data collection</b> — we do not collect or sell your data.</li>
+            </ul>
+            <div style="background:#f8f9fa; border-radius:8px; padding:10px 16px; margin-bottom:12px; font-size:0.98em; color:#555;">
+                <b>Copyright &copy; 2025 ManjusPrasad.</b> All rights reserved. This app is for personal and educational use only. Unauthorized copying or distribution is prohibited.
+            </div>
             <div style="text-align:right; margin-top:12px;"><button id="close-privacy" class="accept-btn">Close</button></div>
         </div>
     </div>

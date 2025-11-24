@@ -9,7 +9,11 @@ A real-time chat application with reaction support built using FastAPI and WebSo
 - User presence (join/leave notifications)
 - Message reactions with emojis
 - Modern, responsive UI
- - Note: This application does not capture or take screenshots (no screen-capture functionality).
+ - No chat history is stored (ephemeral messaging)
+ - Cannot take screenshots (privacy by design)
+ - Private chat rooms
+ - Share images and videos
+ - Copyright © 2025 ManjusPrasad. All rights reserved.
 
 ## Tech Stack
 
