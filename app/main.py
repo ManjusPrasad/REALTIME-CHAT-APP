@@ -78,6 +78,34 @@ async def view_once(token: str):
         return HTMLResponse(status_code=500, content="Error serving file")
 templates = Jinja2Templates(directory="templates")
 
+
+@app.get("/privacy")
+async def privacy_page():
+        """Serve the `PRIVACY.md` file as simple readable HTML."""
+        md_path = os.path.join(os.path.dirname(__file__), '..', 'PRIVACY.md')
+        try:
+                with open(md_path, 'r', encoding='utf-8') as f:
+                        md = f.read()
+        except Exception:
+                return HTMLResponse('<p>Privacy file not found.</p>', status_code=404)
+
+        # Minimal safe rendering: escape HTML and preserve line breaks
+        safe = md.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        html = f"""
+        <html>
+            <head>
+                <meta charset='utf-8'>
+                <title>Privacy</title>
+                <style>body{{font-family:Segoe UI,Arial,Helvetica,sans-serif;padding:20px;max-width:900px;margin:auto}} pre{{white-space:pre-wrap}}</style>
+            </head>
+            <body>
+                <h1>Privacy</h1>
+                <pre>{safe}</pre>
+            </body>
+        </html>
+        """
+        return HTMLResponse(html)
+
 class ConnectionManager:
     def __init__(self):
         self.rooms: Dict[str, List[WebSocket]] = {}
