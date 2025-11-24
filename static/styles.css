@@ -15,6 +15,20 @@ body {
 }
 
 /* Landing Panel Styles */
+.landing-panel {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+}
+
+.landing-content h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2rem;
 }
 
 .form-group {
