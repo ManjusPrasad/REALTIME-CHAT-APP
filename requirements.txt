@@ -5,3 +5,4 @@ python-multipart>=0.0.6
 starlette>=0.36
 pydantic>=2.7
 anyio>=4.0
+aiofiles>=23.1

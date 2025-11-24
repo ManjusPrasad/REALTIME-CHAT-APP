@@ -17,6 +17,11 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     # Save uploaded file to uploads dir
