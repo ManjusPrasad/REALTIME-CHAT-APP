@@ -510,3 +510,22 @@ body {
     background: rgba(0,0,0,0.8);
     z-index: 2000;
 }
+
+/* Login panel */
+.login-panel {
+    background:#fff;
+    padding:18px;
+    border-radius:8px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    max-width:420px;
+    margin:6px auto 18px auto;
+}
+.login-panel h2{margin:0 0 8px 0;font-size:1.15rem}
+.login-panel .login-note{font-size:0.85rem;color:#666;margin-top:8px}
+.login-form .form-group{margin-bottom:8px}
+.login-form input{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px}
+.login-form button{background:#0b5cff;color:#fff;border:none;padding:10px 14px;border-radius:6px;cursor:pointer}
+
+/* View-once viewer media styles */
+.view-once-viewer img, .view-once-viewer video{border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5);max-width:92%;max-height:92%;}
+
