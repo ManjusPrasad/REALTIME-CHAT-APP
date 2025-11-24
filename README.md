@@ -123,5 +123,3 @@ Deployment notes:
 - `railway.json` contains a `startCommand` for `uvicorn` and a `healthcheckPath` set to `/health`.
 - `requirements.txt` includes `aiofiles` for static file support.
 - Add unit/integration tests for WebSocket handlers and reaction logic.
-
-If you want, I can open a new `DOCS.md` or `ARCHITECTURE.md` file with diagrams and explicit instructions for production hardeni
