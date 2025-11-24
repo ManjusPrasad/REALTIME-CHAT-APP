@@ -122,12 +122,6 @@ Scalability & reliability suggestions:
 Deployment notes:
 - `railway.json` contains a `startCommand` for `uvicorn` and a `healthcheckPath` set to `/health`.
 - `requirements.txt` includes `aiofiles` for static file support.
-
-Next steps / roadmap:
-- Add authentication and user profiles.
-- Add optional message persistence with user consent (toggle to save chat history).
-- Implement E2E encryption for private rooms if high confidentiality is required.
-- Move file uploads to persistent object storage with signed URLs.
 - Add unit/integration tests for WebSocket handlers and reaction logic.
 
-If you want, I can open a new `DOCS.md` or `ARCHITECTURE.md` file with diagrams and explicit instructions for production hardening.
+If you want, I can open a new `DOCS.md` or `ARCHITECTURE.md` file with diagrams and explicit instructions for production hardeni
